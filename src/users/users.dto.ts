@@ -35,7 +35,7 @@ export class UpdateUserDto {
   password: string;
 }
 
-export class UUIDDto {
+export class UuidDto {
   @ApiProperty()
   @IsUUID()
   id: string;

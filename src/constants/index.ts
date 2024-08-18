@@ -6,7 +6,7 @@ export const SWAGGER_DES_USER_DELETED =
 export const SWAGGER_DES_USER_UPDATED =
   'User was updated successfully. No content returned.';
 
-export const SWAGGER_DES_USER_GOTTEN = 'User was obtained successfully.';
+export const SWAGGER_DES_USER_READ = 'User was obtained successfully.';
 
 export const SWAGGER_DES_MOVIE_CREATED = 'Movie was created successfully.';
 
