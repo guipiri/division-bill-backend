@@ -1,11 +1,16 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hashSync as bcryptHashSync } from 'bcrypt';
-import { USER_ALREADY_EXISTS, USER_NOT_FOUND } from 'src/constants';
+import {
+  BAD_REQUEST,
+  USER_ALREADY_EXISTS,
+  USER_NOT_FOUND,
+} from 'src/constants';
 import { Repository } from 'typeorm';
 import { UpdateUserDto, UserDto } from './users.dto';
 import { User } from './users.entity';
@@ -47,7 +52,12 @@ export class UsersService {
   }
 
   async update(id: string, { password, username }: UpdateUserDto) {
+    if (!(username && password)) throw new BadRequestException(BAD_REQUEST);
+
     const usernameExists = await this.userRepository.existsBy({ username });
+
+    console.log(usernameExists);
+
     if (usernameExists) throw new ConflictException(USER_ALREADY_EXISTS);
 
     const { affected } = await this.userRepository.update(id, {

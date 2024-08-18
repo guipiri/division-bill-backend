@@ -1,16 +1,10 @@
+import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsAlphanumeric,
-  IsNotEmpty,
-  IsString,
-  IsUUID,
-  MaxLength,
-} from 'class-validator';
+import { IsAlphanumeric, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class UserDto {
   @ApiProperty()
   @IsString()
-  @MaxLength(10)
   @IsNotEmpty()
   @IsAlphanumeric()
   username: string;
@@ -21,19 +15,22 @@ export class UserDto {
   password: string;
 }
 
-export class UpdateUserDto {
-  @ApiProperty({ required: false })
-  @IsString()
-  @MaxLength(10)
-  @IsNotEmpty()
-  @IsAlphanumeric()
-  username: string;
+// export class UpdateUserDto {
+//   @ApiProperty({ required: false })
+//   @IsString()
+//   @IsNotEmpty()
+//   @IsAlphanumeric()
+//   @IsOptional()
+//   username?: string;
 
-  @ApiProperty({ required: false })
-  @IsString()
-  @IsNotEmpty()
-  password: string;
-}
+//   @ApiProperty({ required: false })
+//   @IsString()
+//   @IsNotEmpty()
+//   @IsOptional()
+//   password?: string;
+// }
+
+export class UpdateUserDto extends PartialType(UserDto) {}
 
 export class UuidDto {
   @ApiProperty()
