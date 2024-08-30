@@ -1,36 +1,55 @@
-import { PartialType } from '@nestjs/mapped-types';
+import { OmitType, PartialType, PickType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsAlphanumeric, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsEmail, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class UserDto {
   @ApiProperty()
   @IsString()
-  @IsNotEmpty()
-  @IsAlphanumeric()
-  username: string;
+  @IsOptional()
+  name?: string;
+
+  @ApiProperty()
+  @IsEmail()
+  email: string;
 
   @ApiProperty()
   @IsString()
-  @IsNotEmpty()
+  google_id: string;
+
+  @ApiProperty()
+  @IsString()
   password: string;
 }
 
-// export class UpdateUserDto {
-//   @ApiProperty({ required: false })
-//   @IsString()
-//   @IsNotEmpty()
-//   @IsAlphanumeric()
-//   @IsOptional()
-//   username?: string;
+export class CreateUserDto {
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  name?: string;
 
-//   @ApiProperty({ required: false })
-//   @IsString()
-//   @IsNotEmpty()
-//   @IsOptional()
-//   password?: string;
-// }
+  @ApiProperty()
+  @IsEmail()
+  email: string;
 
-export class UpdateUserDto extends PartialType(UserDto) {}
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  google_id?: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  password?: string;
+}
+
+export class CreateUserWithCredentialsDto extends PickType(UserDto, [
+  'email',
+  'password',
+]) {}
+
+export class CreateUserWithGoogleDto extends OmitType(UserDto, ['password']) {}
+
+export class UpdateUserDto extends PartialType(CreateUserWithCredentialsDto) {}
 
 export class UuidDto {
   @ApiProperty()

@@ -14,12 +14,19 @@ export class User {
   id: string;
 
   @ApiProperty()
-  @Column({ type: 'varchar', length: 10, nullable: false })
-  username: string;
+  @Column({ type: 'varchar', nullable: true })
+  name: string;
 
   @ApiProperty()
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: false, unique: true })
+  email: string;
+
+  @ApiProperty()
+  @Column({ type: 'varchar', nullable: true })
   password: string;
+
+  @Column({ nullable: true })
+  google_id: string;
 
   @ApiProperty()
   @CreateDateColumn({ type: 'timestamp with time zone' })

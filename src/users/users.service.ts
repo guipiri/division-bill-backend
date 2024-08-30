@@ -12,7 +12,11 @@ import {
   USER_NOT_FOUND,
 } from 'src/constants';
 import { Repository } from 'typeorm';
-import { UpdateUserDto, UserDto } from './users.dto';
+import {
+  CreateUserWithCredentialsDto,
+  CreateUserWithGoogleDto,
+  UpdateUserDto,
+} from './users.dto';
 import { User } from './users.entity';
 
 @Injectable()
@@ -21,14 +25,27 @@ export class UsersService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
-  async create({ password, username }: UserDto) {
-    const usernameExists = await this.userRepository.existsBy({ username });
-    if (usernameExists) throw new ConflictException(USER_ALREADY_EXISTS);
+  async createWithCredentials({
+    email,
+    password,
+  }: CreateUserWithCredentialsDto) {
+    const emailExists = await this.userRepository.existsBy({ email });
+    if (emailExists) throw new ConflictException(USER_ALREADY_EXISTS);
 
-    return await this.userRepository.save({
-      username,
+    await this.userRepository.save({
+      email,
+      name: email.split('@')[0],
       password: bcryptHashSync(password, 10),
     });
+    return { success: true, message: 'Usuário criado com sucesso!' };
+  }
+
+  async createWithGoogle({ google_id, email, name }: CreateUserWithGoogleDto) {
+    await this.userRepository.upsert(
+      { google_id, email, name: name ? name : email.split('@')[0] },
+      { conflictPaths: ['email'], skipUpdateIfNoValuesChanged: true },
+    );
+    return { success: true, message: 'Usuário logado com sucesso!' };
   }
 
   async findAll() {
@@ -43,25 +60,25 @@ export class UsersService {
     return user;
   }
 
-  async findByUsername(username: string) {
-    const user = await this.userRepository.findOneBy({ username });
+  async findByEmail(email: string) {
+    const user = await this.userRepository.findOneBy({ email });
     if (!user) {
-      throw new NotFoundException(`${USER_NOT_FOUND} ${username}`);
+      throw new NotFoundException(`${USER_NOT_FOUND} ${email}`);
     }
     return user;
   }
 
-  async update(id: string, { password, username }: UpdateUserDto) {
-    if (!(username && password)) throw new BadRequestException(BAD_REQUEST);
+  async update(id: string, { password, email }: UpdateUserDto) {
+    if (!(email && password)) throw new BadRequestException(BAD_REQUEST);
 
-    const usernameExists = await this.userRepository.existsBy({ username });
+    const emailExists = await this.userRepository.existsBy({ email });
 
-    console.log(usernameExists);
+    console.log(emailExists);
 
-    if (usernameExists) throw new ConflictException(USER_ALREADY_EXISTS);
+    if (emailExists) throw new ConflictException(USER_ALREADY_EXISTS);
 
     const { affected } = await this.userRepository.update(id, {
-      username,
+      email,
       password: bcryptHashSync(password, 10),
     });
     if (!affected) {

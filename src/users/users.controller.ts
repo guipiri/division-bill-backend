@@ -21,7 +21,7 @@ import {
   SWAGGER_DES_USER_READ,
   SWAGGER_DES_USER_UPDATED,
 } from 'src/constants';
-import { UpdateUserDto, UserDto, UuidDto } from './users.dto';
+import { CreateUserDto, UpdateUserDto, UuidDto } from './users.dto';
 import { User } from './users.entity';
 import { UsersService } from './users.service';
 
@@ -29,14 +29,26 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  /* ------ Route to create user ------ */
+  /* ------ Route to create user with credentials or google ------ */
   @ApiCreatedResponse({
     description: SWAGGER_DES_USER_CREATED,
     type: User,
   })
   @Post()
-  create(@Body() createUserDto: UserDto) {
-    return this.usersService.create(createUserDto);
+  create(
+    @Body()
+    createUserDto: CreateUserDto,
+  ) {
+    if (createUserDto.google_id)
+      return this.usersService.createWithGoogle({
+        email: createUserDto.email,
+        google_id: createUserDto.google_id,
+        name: createUserDto.name,
+      });
+    return this.usersService.createWithCredentials({
+      password: createUserDto.password,
+      email: createUserDto.email,
+    });
   }
   /* -----------------------------------*/
 
@@ -57,7 +69,7 @@ export class UsersController {
     if (isUUID(idOrUsername)) {
       return await this.usersService.findById(idOrUsername);
     } else {
-      return await this.usersService.findByUsername(idOrUsername);
+      return await this.usersService.findByEmail(idOrUsername);
     }
   }
   /* --------------------------------------------*/
