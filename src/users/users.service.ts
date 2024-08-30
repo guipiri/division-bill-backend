@@ -9,6 +9,7 @@ import { hashSync as bcryptHashSync } from 'bcrypt';
 import {
   BAD_REQUEST,
   USER_ALREADY_EXISTS,
+  USER_ALREADY_EXISTS_WITH_GOOGLE,
   USER_NOT_FOUND,
 } from 'src/constants';
 import { Repository } from 'typeorm';
@@ -29,14 +30,21 @@ export class UsersService {
     email,
     password,
   }: CreateUserWithCredentialsDto) {
-    const emailExists = await this.userRepository.existsBy({ email });
-    if (emailExists) throw new ConflictException(USER_ALREADY_EXISTS);
+    const userWithEmailProvided = await this.userRepository.findOne({
+      where: { email },
+    });
+    if (userWithEmailProvided && userWithEmailProvided.google_id)
+      throw new ConflictException(USER_ALREADY_EXISTS_WITH_GOOGLE);
+
+    if (userWithEmailProvided && !userWithEmailProvided.password)
+      throw new ConflictException(USER_ALREADY_EXISTS);
 
     await this.userRepository.save({
       email,
       name: email.split('@')[0],
       password: bcryptHashSync(password, 10),
     });
+
     return { success: true, message: 'Usuário criado com sucesso!' };
   }
 

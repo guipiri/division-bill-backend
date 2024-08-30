@@ -25,7 +25,11 @@ export const SWAGGER_DES_BAD_REQUEST = 'Malformed request.';
 
 export const USER_NOT_FOUND = 'User not found:';
 
-export const USER_ALREADY_EXISTS = 'User already exists:';
+export const USER_ALREADY_EXISTS =
+  'Este usuário já existe. Faça login com seu e-mail e senha.';
+
+export const USER_ALREADY_EXISTS_WITH_GOOGLE =
+  'Este usuário já existe. Faça login com o Google.';
 
 export const BAD_REQUEST =
   'Malformed body request. At least one propertie is necessary to update.';
