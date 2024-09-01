@@ -2,9 +2,9 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { compareSync as bcryptCompareSync } from 'bcrypt';
-import { CreateUserWithCredentialsDto } from 'src/users/users.dto';
+import { OAuth2Client } from 'google-auth-library';
 import { UsersService } from 'src/users/users.service';
-import { AuthDto } from './auth.dto';
+import { AuthDto, SignInDto, SignInWithGoogleDto } from './auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,14 +13,12 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly userService: UsersService,
     private readonly configService: ConfigService,
+    private readonly oAuth2Client: OAuth2Client,
   ) {
     this.expiresIn = this.configService.get<number>('JWT_EXPIRATION_SECONDS');
   }
 
-  async signIn({
-    email,
-    password,
-  }: CreateUserWithCredentialsDto): Promise<AuthDto> {
+  async signIn({ email, password }: SignInDto): Promise<AuthDto> {
     const user = await this.userService.findByEmail(email);
 
     if (!bcryptCompareSync(password, user.password))
@@ -33,5 +31,24 @@ export class AuthService {
       token: this.jwtService.sign(payload),
       expiresIn: this.expiresIn,
     };
+  }
+
+  async signInWithGoogle({ idToken }: SignInWithGoogleDto): Promise<AuthDto> {
+    try {
+      const ticket = await this.oAuth2Client.verifyIdToken({ idToken });
+      const { email } = ticket.getPayload();
+      //trocar aqui para pesquisar por google id (criar este serviço no users service)
+      const { id } = await this.userService.findByEmail(email);
+      const payload = {
+        sub: id,
+        email,
+      };
+      return {
+        token: this.jwtService.sign(payload),
+        expiresIn: this.expiresIn,
+      };
+    } catch (error) {
+      throw new UnauthorizedException();
+    }
   }
 }

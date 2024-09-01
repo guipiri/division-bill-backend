@@ -21,25 +21,29 @@ export class UserDto {
   password: string;
 }
 
+// export class CreateUserDto {
+//   @ApiProperty()
+//   @IsString()
+//   @IsOptional()
+//   name?: string;
+
+//   @ApiProperty()
+//   @IsEmail()
+//   email: string;
+
+//   @ApiProperty()
+//   @IsString()
+//   @IsOptional()
+//   google_id?: string;
+
+//   @ApiProperty()
+//   @IsString()
+//   @IsOptional()
+//   password?: string;
+// }
+
 export class CreateUserDto {
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  name?: string;
-
-  @ApiProperty()
-  @IsEmail()
-  email: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  google_id?: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  password?: string;
+  createUser: CreateUserWithCredentialsDto | CreateUserWithGoogleDto;
 }
 
 export class CreateUserWithCredentialsDto extends PickType(UserDto, [

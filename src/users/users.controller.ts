@@ -21,7 +21,12 @@ import {
   SWAGGER_DES_USER_READ,
   SWAGGER_DES_USER_UPDATED,
 } from 'src/constants';
-import { CreateUserDto, UpdateUserDto, UuidDto } from './users.dto';
+import {
+  CreateUserWithCredentialsDto,
+  CreateUserWithGoogleDto,
+  UpdateUserDto,
+  UuidDto,
+} from './users.dto';
 import { User } from './users.entity';
 import { UsersService } from './users.service';
 
@@ -29,25 +34,37 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  /* ------ Route to create user with credentials or google ------ */
+  /* ------ Route to create user with credentials ------ */
   @ApiCreatedResponse({
     description: SWAGGER_DES_USER_CREATED,
     type: User,
   })
   @Post()
+  createWithCredentials(
+    @Body()
+    { password, email }: CreateUserWithCredentialsDto,
+  ) {
+    return this.usersService.createWithCredentials({
+      password,
+      email,
+    });
+  }
+  /* -----------------------------------*/
+
+  /* ------ Route to create user with google ------ */
+  @ApiCreatedResponse({
+    description: SWAGGER_DES_USER_CREATED,
+    type: User,
+  })
+  @Post('google')
   create(
     @Body()
-    createUserDto: CreateUserDto,
+    { email, google_id, name }: CreateUserWithGoogleDto,
   ) {
-    if (createUserDto.google_id)
-      return this.usersService.createWithGoogle({
-        email: createUserDto.email,
-        google_id: createUserDto.google_id,
-        name: createUserDto.name,
-      });
-    return this.usersService.createWithCredentials({
-      password: createUserDto.password,
-      email: createUserDto.email,
+    return this.usersService.createWithGoogle({
+      email,
+      google_id,
+      name,
     });
   }
   /* -----------------------------------*/
@@ -64,12 +81,12 @@ export class UsersController {
   /* ------ Route to get user by username or id ------ */
   @AuthDecorators()
   @ApiOkResponse({ description: SWAGGER_DES_USER_READ, type: User })
-  @Get(':idOrUsername')
-  async findOne(@Param('idOrUsername') idOrUsername: string) {
-    if (isUUID(idOrUsername)) {
-      return await this.usersService.findById(idOrUsername);
+  @Get(':idOrEmail')
+  async findOne(@Param('idOrEmail') idOrEmail: string) {
+    if (isUUID(idOrEmail)) {
+      return await this.usersService.findById(idOrEmail);
     } else {
-      return await this.usersService.findByEmail(idOrUsername);
+      return await this.usersService.findByEmail(idOrEmail);
     }
   }
   /* --------------------------------------------*/
