@@ -48,7 +48,7 @@ export class UsersService {
     return { success: true, message: 'Usuário criado com sucesso!' };
   }
 
-  async createWithGoogle({ google_id, email, name }: CreateUserWithGoogleDto) {
+  async upsertWithGoogle({ google_id, email, name }: CreateUserWithGoogleDto) {
     await this.userRepository.upsert(
       { google_id, email, name: name ? name : email.split('@')[0] },
       { conflictPaths: ['email'], skipUpdateIfNoValuesChanged: true },

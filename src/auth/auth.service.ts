@@ -4,11 +4,17 @@ import { JwtService } from '@nestjs/jwt';
 import { compareSync as bcryptCompareSync } from 'bcrypt';
 import { OAuth2Client } from 'google-auth-library';
 import { UsersService } from 'src/users/users.service';
-import { AuthDto, SignInDto, SignInWithGoogleDto } from './auth.dto';
+import {
+  AuthDto,
+  SignInWithCredentialsDto,
+  SignInWithGoogleDto,
+} from './auth.dto';
 
 @Injectable()
 export class AuthService {
   private expiresIn: number;
+  private webClientId: string;
+  private iosClientId: string;
   constructor(
     private readonly jwtService: JwtService,
     private readonly userService: UsersService,
@@ -16,13 +22,17 @@ export class AuthService {
     private readonly oAuth2Client: OAuth2Client,
   ) {
     this.expiresIn = this.configService.get<number>('JWT_EXPIRATION_SECONDS');
+    this.webClientId = this.configService.get<string>('WEB_CLIENT_ID');
+    this.iosClientId = this.configService.get<string>('IOS_CLIENT_ID');
   }
 
-  async signIn({ email, password }: SignInDto): Promise<AuthDto> {
+  async signInWithCredentials({
+    email,
+    password,
+  }: SignInWithCredentialsDto): Promise<AuthDto> {
     const user = await this.userService.findByEmail(email);
-
     if (!bcryptCompareSync(password, user.password))
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Credenciais inválidas');
     const payload = {
       sub: user.id,
       email: user.email,
@@ -35,7 +45,10 @@ export class AuthService {
 
   async signInWithGoogle({ idToken }: SignInWithGoogleDto): Promise<AuthDto> {
     try {
-      const ticket = await this.oAuth2Client.verifyIdToken({ idToken });
+      const ticket = await this.oAuth2Client.verifyIdToken({
+        idToken,
+        audience: [this.iosClientId, this.webClientId],
+      });
       const { email } = ticket.getPayload();
       //trocar aqui para pesquisar por google id (criar este serviço no users service)
       const { id } = await this.userService.findByEmail(email);
@@ -43,6 +56,7 @@ export class AuthService {
         sub: id,
         email,
       };
+
       return {
         token: this.jwtService.sign(payload),
         expiresIn: this.expiresIn,

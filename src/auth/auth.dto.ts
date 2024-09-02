@@ -6,7 +6,7 @@ export class AuthDto {
   expiresIn: number;
 }
 
-export class SignInDto extends CreateUserWithCredentialsDto {}
+export class SignInWithCredentialsDto extends CreateUserWithCredentialsDto {}
 
 export class SignInWithGoogleDto {
   @IsJWT()

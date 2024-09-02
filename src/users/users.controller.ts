@@ -61,7 +61,7 @@ export class UsersController {
     @Body()
     { email, google_id, name }: CreateUserWithGoogleDto,
   ) {
-    return this.usersService.createWithGoogle({
+    return this.usersService.upsertWithGoogle({
       email,
       google_id,
       name,
