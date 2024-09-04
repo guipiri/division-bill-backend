@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/users.entity';
 import { In, Repository } from 'typeorm';
@@ -25,6 +25,15 @@ export class GroupsService {
     return this.groupRepository.findOne({ where: { id } });
   }
 
+  async findByUserId(userId: string) {
+    const { groups } = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: { groups: true },
+    });
+
+    return groups;
+  }
+
   async updateName(groupId: string, groupDto: GroupDto) {
     await this.groupRepository.update({ id: groupId }, groupDto);
     return { success: true, message: 'Grupo atualizado com sucesso!' };
@@ -37,11 +46,15 @@ export class GroupsService {
         members: true,
       },
     });
-    console.log(group);
+    if (!group)
+      throw new NotFoundException(`Grupo com id ${groupId} não encontrado!`);
 
     const users = await this.userRepository.find({
       where: { id: In(membersIds) },
     });
+    if (users.length === 0)
+      throw new NotFoundException(`Usuários não encontrados!`);
+
     group.members = [...group.members, ...users];
     await this.groupRepository.save(group);
     return { success: true, message: 'Membro adicionado com sucesso!' };
@@ -54,6 +67,8 @@ export class GroupsService {
         members: true,
       },
     });
+    if (!group)
+      throw new NotFoundException(`Grupo com id ${groupId} não encontrado!`);
 
     group.members = group.members.filter(({ id }) => !membersIds.includes(id));
     await this.groupRepository.save(group);

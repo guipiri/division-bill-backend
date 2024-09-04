@@ -7,9 +7,9 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { AuthDecorators } from 'src/auth/auth.decorator';
-import { UuidDto } from 'src/users/users.dto';
 import { ChangeMembersDto, GroupDto } from './groups.dto';
 import { GroupsService } from './groups.service';
 
@@ -24,12 +24,15 @@ export class GroupsController {
   }
 
   @Get()
-  findAll() {
+  findAll(
+    @Query('userId', new ParseUUIDPipe({ optional: true })) userId?: string,
+  ) {
+    if (userId) return this.groupsService.findByUserId(userId);
     return this.groupsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', new ParseUUIDPipe()) { id }: UuidDto) {
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.groupsService.findOne(id);
   }
 

@@ -62,6 +62,8 @@ export class AuthService {
         expiresIn: this.expiresIn,
       };
     } catch (error) {
+      console.log(error);
+
       throw new UnauthorizedException();
     }
   }
