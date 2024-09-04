@@ -36,7 +36,7 @@ export class UsersService {
     if (userWithEmailProvided && userWithEmailProvided.google_id)
       throw new ConflictException(USER_ALREADY_EXISTS_WITH_GOOGLE);
 
-    if (userWithEmailProvided && !userWithEmailProvided.password)
+    if (userWithEmailProvided && userWithEmailProvided.password)
       throw new ConflictException(USER_ALREADY_EXISTS);
 
     await this.userRepository.save({
@@ -80,8 +80,6 @@ export class UsersService {
     if (!(email && password)) throw new BadRequestException(BAD_REQUEST);
 
     const emailExists = await this.userRepository.existsBy({ email });
-
-    console.log(emailExists);
 
     if (emailExists) throw new ConflictException(USER_ALREADY_EXISTS);
 

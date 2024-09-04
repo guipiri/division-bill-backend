@@ -1,23 +1,63 @@
 import { Injectable } from '@nestjs/common';
-import { CreateGroupDto } from './dto/create-group.dto';
-import { UpdateGroupDto } from './dto/update-group.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/users/users.entity';
+import { In, Repository } from 'typeorm';
+import { Group } from './group.entity';
+import { ChangeMembersDto, GroupDto } from './groups.dto';
 
 @Injectable()
 export class GroupsService {
-  create(createGroupDto: CreateGroupDto) {
-    return 'This action adds a new group';
+  constructor(
+    @InjectRepository(Group) private groupRepository: Repository<Group>,
+    @InjectRepository(User) private userRepository: Repository<User>,
+  ) {}
+
+  create({ name }: GroupDto) {
+    this.groupRepository.save({ name });
+    return { success: true, message: 'Grupo criado com sucesso!' };
   }
 
   findAll() {
-    return `This action returns all groups`;
+    return this.groupRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} group`;
+  findOne(id: string) {
+    return this.groupRepository.findOne({ where: { id } });
   }
 
-  update(id: number, updateGroupDto: UpdateGroupDto) {
-    return `This action updates a #${id} group`;
+  async updateName(groupId: string, groupDto: GroupDto) {
+    await this.groupRepository.update({ id: groupId }, groupDto);
+    return { success: true, message: 'Grupo atualizado com sucesso!' };
+  }
+
+  async addMembers(groupId: string, { membersIds }: ChangeMembersDto) {
+    const group = await this.groupRepository.findOne({
+      where: { id: groupId },
+      relations: {
+        members: true,
+      },
+    });
+    console.log(group);
+
+    const users = await this.userRepository.find({
+      where: { id: In(membersIds) },
+    });
+    group.members = [...group.members, ...users];
+    await this.groupRepository.save(group);
+    return { success: true, message: 'Grupo atualizado com sucesso!' };
+  }
+
+  async removeMembers(groupId: string, { membersIds }: ChangeMembersDto) {
+    const group = await this.groupRepository.findOne({
+      where: { id: groupId },
+      relations: {
+        members: true,
+      },
+    });
+
+    group.members = group.members.filter((user) => !(user.id in membersIds));
+    await this.groupRepository.save(group);
+    return { success: true, message: 'Grupo atualizado com sucesso!' };
   }
 
   remove(id: number) {

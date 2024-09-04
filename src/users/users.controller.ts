@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
 } from '@nestjs/common';
@@ -25,7 +26,6 @@ import {
   CreateUserWithCredentialsDto,
   CreateUserWithGoogleDto,
   UpdateUserDto,
-  UuidDto,
 } from './users.dto';
 import { User } from './users.entity';
 import { UsersService } from './users.service';
@@ -82,7 +82,12 @@ export class UsersController {
   @AuthDecorators()
   @ApiOkResponse({ description: SWAGGER_DES_USER_READ, type: User })
   @Get(':idOrEmail')
-  async findOne(@Param('idOrEmail') idOrEmail: string) {
+  async findOne(
+    @Param(
+      'idOrEmail' /*Implementar aqui um pipe personalizado para validar se é um email ou um uuid*/,
+    )
+    idOrEmail: string,
+  ) {
     if (isUUID(idOrEmail)) {
       return await this.usersService.findById(idOrEmail);
     } else {
@@ -97,7 +102,7 @@ export class UsersController {
   @HttpCode(204)
   @Patch(':id')
   async update(
-    @Param('id') { id }: UuidDto,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return await this.usersService.update(id, updateUserDto);
@@ -109,7 +114,7 @@ export class UsersController {
   @ApiResponse({ status: 204, description: SWAGGER_DES_USER_DELETED })
   @HttpCode(204)
   @Delete(':id')
-  remove(@Param('id') { id }: UuidDto) {
+  remove(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.usersService.remove(id);
   }
   /* -----------------------------------*/

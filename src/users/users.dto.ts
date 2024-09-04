@@ -1,6 +1,6 @@
 import { OmitType, PartialType, PickType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsEmail, IsOptional, IsString } from 'class-validator';
 
 export class UserDto {
   @ApiProperty()
@@ -57,6 +57,6 @@ export class UpdateUserDto extends PartialType(CreateUserWithCredentialsDto) {}
 
 export class UuidDto {
   @ApiProperty()
-  @IsUUID()
+  // @IsUUID()
   id: string;
 }

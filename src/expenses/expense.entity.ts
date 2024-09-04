@@ -1,43 +1,49 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Loan } from 'src/expenses/loan.entity';
 import { Group } from 'src/groups/group.entity';
+import { User } from 'src/users/users.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Loan } from './loan.entity';
 
 @Entity()
-export class User {
+export class Expense {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @ApiProperty()
-  @Column({ type: 'varchar', nullable: true })
+  @Column()
   name: string;
 
   @ApiProperty()
-  @Column({ type: 'varchar', nullable: false, unique: true })
-  email: string;
+  @ManyToOne(() => User)
+  paying_member: User;
 
   @ApiProperty()
-  @Column({ type: 'varchar', nullable: true })
-  password: string;
+  @ManyToMany(() => User)
+  @JoinTable()
+  members: User[];
 
-  @Column({ nullable: true })
-  google_id: string;
-
-  @OneToMany(() => Loan, (loan) => loan.member)
+  @ApiProperty()
+  @OneToMany(() => Loan, (loan) => loan.expense)
   loan: Loan[];
 
   @ApiProperty()
-  @ManyToMany(() => Group, (group) => group.members)
-  groups: Group[];
+  @ManyToOne(() => Group)
+  group: Group;
+
+  @ApiProperty()
+  @Column('float')
+  amount: number;
 
   @ApiProperty()
   @CreateDateColumn({ type: 'timestamp with time zone' })
