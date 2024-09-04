@@ -44,7 +44,7 @@ export class GroupsService {
     });
     group.members = [...group.members, ...users];
     await this.groupRepository.save(group);
-    return { success: true, message: 'Usuário adicionado com sucesso!' };
+    return { success: true, message: 'Membro adicionado com sucesso!' };
   }
 
   async removeMembers(groupId: string, { membersIds }: ChangeMembersDto) {
@@ -57,10 +57,11 @@ export class GroupsService {
 
     group.members = group.members.filter(({ id }) => !membersIds.includes(id));
     await this.groupRepository.save(group);
-    return { success: true, message: 'Usuário removido com sucesso!' };
+    return { success: true, message: 'Membro removido com sucesso!' };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} group`;
+  remove(id: string) {
+    this.groupRepository.delete({ id });
+    return { success: true, message: 'Grupo removido com sucesso!' };
   }
 }

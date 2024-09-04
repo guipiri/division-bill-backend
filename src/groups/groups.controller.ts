@@ -59,6 +59,6 @@ export class GroupsController {
 
   @Delete(':id')
   remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.groupsService.remove(+id);
+    return this.groupsService.remove(id);
   }
 }
