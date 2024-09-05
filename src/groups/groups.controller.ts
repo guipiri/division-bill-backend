@@ -8,8 +8,10 @@ import {
   Patch,
   Post,
   Query,
+  Request,
 } from '@nestjs/common';
 import { AuthDecorators } from 'src/auth/auth.decorator';
+import { RequestWithUser } from 'src/auth/auth.dto';
 import { ChangeMembersDto, GroupDto } from './groups.dto';
 import { GroupsService } from './groups.service';
 
@@ -19,8 +21,11 @@ export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 
   @Post()
-  create(@Body() createGroupDto: GroupDto) {
-    return this.groupsService.create(createGroupDto);
+  create(
+    @Request() { user: { sub: userId } }: RequestWithUser,
+    @Body() createGroupDto: GroupDto,
+  ) {
+    return this.groupsService.create(createGroupDto, userId);
   }
 
   @Get()

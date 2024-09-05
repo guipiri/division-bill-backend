@@ -12,8 +12,9 @@ export class GroupsService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
-  create({ name }: GroupDto) {
-    this.groupRepository.save({ name });
+  async create({ name }: GroupDto, id: string) {
+    const createdBy = await this.userRepository.findOne({ where: { id } });
+    this.groupRepository.save({ name, members: [createdBy] });
     return { success: true, message: 'Grupo criado com sucesso!' };
   }
 
