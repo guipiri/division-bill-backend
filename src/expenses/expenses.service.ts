@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Division } from './division.entity';
@@ -27,9 +27,7 @@ export class ExpensesService {
 
       return await this.divisionRepository.save(divisions);
     } catch (error) {
-      console.log(error);
-
-      return { success: false, message: error.detail };
+      throw new BadRequestException(error.detail);
     }
   }
 

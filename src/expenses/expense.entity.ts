@@ -38,7 +38,7 @@ export class Expense {
   @Column({ name: 'group_id' })
   groupId: string;
 
-  @ManyToOne(() => Group)
+  @ManyToOne(() => Group, (group) => group.expenses)
   @JoinColumn({ name: 'group_id' })
   group: Group;
 

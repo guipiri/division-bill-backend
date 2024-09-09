@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Expense } from 'src/expenses/expense.entity';
 import { User } from 'src/users/users.entity';
 import {
   Column,
@@ -6,6 +7,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -33,6 +35,10 @@ export class Group {
   @ManyToMany(() => User, (user) => user.groups, { cascade: true })
   @JoinTable({ name: 'group_members' })
   members: User[];
+
+  @ApiProperty()
+  @OneToMany(() => Expense, (expense) => expense.group)
+  expenses: Expense[];
 
   @ApiProperty()
   @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })

@@ -6,7 +6,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { CreateDivisionDto, CreateExpenseDto } from './expenses.dto';
+import { CreateDivisionDto, CreateExpenseDto } from '../expenses.dto';
 
 @ValidatorConstraint({ name: 'DivisionSumEqualToExpense' })
 export class DivisionSumEqualToExpenseAmountConstrait

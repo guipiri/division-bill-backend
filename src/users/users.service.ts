@@ -68,6 +68,19 @@ export class UsersService {
     return user;
   }
 
+  async findByGroupId(groupId: string) {
+    const user = await this.userRepository.find({
+      where: {
+        groups: { id: groupId },
+      },
+      select: { id: true },
+    });
+    if (!user) {
+      throw new NotFoundException(`${USER_NOT_FOUND} ${groupId}`);
+    }
+    return user;
+  }
+
   async findByEmail(email: string) {
     const user = await this.userRepository.findOneBy({ email });
     if (!user) {

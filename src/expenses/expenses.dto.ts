@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsNumber, IsString, IsUUID, ValidateNested } from 'class-validator';
-import { DivisionSumEqualToExpenseAmount } from './division.validator';
+import { DivisionSumEqualToExpenseAmount } from './validators/division-sum-equal-expense-amount.validator';
+import { DivisionUsersBelongsToExpenseGroup } from './validators/division-users-belongs-to-expense-group.validator';
 
 export class CreateDivisionDto {
   @ApiProperty()
@@ -22,6 +23,7 @@ export class CreateExpenseDto {
   payingMemberId: string;
 
   @ApiProperty()
+  @DivisionUsersBelongsToExpenseGroup()
   @DivisionSumEqualToExpenseAmount()
   @ValidateNested({ each: true })
   @Type(() => CreateDivisionDto)
