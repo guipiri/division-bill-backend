@@ -26,19 +26,19 @@ export class Group {
   name: string;
 
   @ApiProperty()
-  @ManyToMany(() => User, (user) => user.groups, { cascade: true })
-  @JoinTable()
-  members: User[];
-
-  @ApiProperty()
   @Column({ type: 'enum', enum: StatusList, default: StatusList.CLOSED })
   status: StatusList;
 
   @ApiProperty()
-  @CreateDateColumn({ type: 'timestamp with time zone' })
-  created_at: Date;
+  @ManyToMany(() => User, (user) => user.groups, { cascade: true })
+  @JoinTable({ name: 'group_members' })
+  members: User[];
 
   @ApiProperty()
-  @UpdateDateColumn({ type: 'timestamp with time zone' })
-  updated_at: Date;
+  @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
+  createdAt: Date;
+
+  @ApiProperty()
+  @UpdateDateColumn({ type: 'timestamp with time zone', name: 'updated_at' })
+  updatedAt: Date;
 }

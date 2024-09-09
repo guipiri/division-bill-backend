@@ -14,33 +14,12 @@ export class UserDto {
 
   @ApiProperty()
   @IsString()
-  google_id: string;
+  googleId: string;
 
   @ApiProperty()
   @IsString()
   password: string;
 }
-
-// export class CreateUserDto {
-//   @ApiProperty()
-//   @IsString()
-//   @IsOptional()
-//   name?: string;
-
-//   @ApiProperty()
-//   @IsEmail()
-//   email: string;
-
-//   @ApiProperty()
-//   @IsString()
-//   @IsOptional()
-//   google_id?: string;
-
-//   @ApiProperty()
-//   @IsString()
-//   @IsOptional()
-//   password?: string;
-// }
 
 export class CreateUserDto {
   createUser: CreateUserWithCredentialsDto | CreateUserWithGoogleDto;

@@ -27,12 +27,12 @@ export class GroupsService {
   }
 
   async findByUserId(userId: string) {
-    const { groups } = await this.userRepository.findOne({
+    const res = await this.userRepository.findOne({
       where: { id: userId },
       relations: { groups: true },
     });
 
-    return groups;
+    return res?.groups || [];
   }
 
   async updateName(groupId: string, groupDto: GroupDto) {

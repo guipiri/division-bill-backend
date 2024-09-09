@@ -59,11 +59,11 @@ export class UsersController {
   @Post('google')
   create(
     @Body()
-    { email, google_id, name }: CreateUserWithGoogleDto,
+    { email, googleId, name }: CreateUserWithGoogleDto,
   ) {
     return this.usersService.upsertWithGoogle({
       email,
-      google_id,
+      googleId,
       name,
     });
   }

@@ -33,7 +33,7 @@ export class UsersService {
     const userWithEmailProvided = await this.userRepository.findOne({
       where: { email },
     });
-    if (userWithEmailProvided && userWithEmailProvided.google_id)
+    if (userWithEmailProvided && userWithEmailProvided.googleId)
       throw new ConflictException(USER_ALREADY_EXISTS_WITH_GOOGLE);
 
     if (userWithEmailProvided && userWithEmailProvided.password)
@@ -48,9 +48,9 @@ export class UsersService {
     return { success: true, message: 'Usuário criado com sucesso!' };
   }
 
-  async upsertWithGoogle({ google_id, email, name }: CreateUserWithGoogleDto) {
+  async upsertWithGoogle({ googleId, email, name }: CreateUserWithGoogleDto) {
     await this.userRepository.upsert(
-      { google_id, email, name: name ? name : email.split('@')[0] },
+      { googleId, email, name: name ? name : email.split('@')[0] },
       { conflictPaths: ['email'], skipUpdateIfNoValuesChanged: true },
     );
     return { success: true, message: 'Usuário logado com sucesso!' };

@@ -1,14 +1,40 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Division } from './division.entity';
+import { Expense } from './expense.entity';
 import { CreateExpenseDto, UpdateExpenseDto } from './expenses.dto';
 
 @Injectable()
 export class ExpensesService {
-  create(createExpenseDto: CreateExpenseDto) {
-    return 'This action adds a new expense';
+  constructor(
+    @InjectRepository(Expense)
+    private expenseRepository: Repository<Expense>,
+    @InjectRepository(Division)
+    private divisionRepository: Repository<Division>,
+  ) {}
+
+  async create(createExpenseDto: CreateExpenseDto) {
+    try {
+      const { id: expenseId } =
+        await this.expenseRepository.save(createExpenseDto);
+
+      const divisions = createExpenseDto.expenseDivision.map(
+        ({ amountBorrowed, userId }) => {
+          return { ...new Division(), amountBorrowed, userId, expenseId };
+        },
+      );
+
+      return await this.divisionRepository.save(divisions);
+    } catch (error) {
+      console.log(error);
+
+      return { success: false, message: error.detail };
+    }
   }
 
   findAll() {
-    return `This action returns all expenses`;
+    return this.expenseRepository.find();
   }
 
   findOne(id: number) {
@@ -16,6 +42,7 @@ export class ExpensesService {
   }
 
   update(id: number, updateExpenseDto: UpdateExpenseDto) {
+    console.log(updateExpenseDto);
     return `This action updates a #${id} expense`;
   }
 

@@ -5,14 +5,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Loan } from './loan.entity';
+import { Division } from './division.entity';
 
 @Entity()
 export class Expense {
@@ -25,31 +24,32 @@ export class Expense {
   name: string;
 
   @ApiProperty()
-  @ManyToOne(() => User)
-  paying_member: User;
-
-  @ApiProperty()
-  @ManyToMany(() => User)
-  @JoinTable()
-  members: User[];
-
-  @ApiProperty()
-  @OneToMany(() => Loan, (loan) => loan.expense)
-  loan: Loan[];
-
-  @ApiProperty()
-  @ManyToOne(() => Group)
-  group: Group;
-
-  @ApiProperty()
   @Column('float')
   amount: number;
 
-  @ApiProperty()
-  @CreateDateColumn({ type: 'timestamp with time zone' })
-  created_at: Date;
+  @Column({ name: 'paying_member_id' })
+  payingMemberId: string;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'paying_member_id' })
+  payingMember: User;
 
   @ApiProperty()
-  @UpdateDateColumn({ type: 'timestamp with time zone' })
-  updated_at: Date;
+  @Column({ name: 'group_id' })
+  groupId: string;
+
+  @ManyToOne(() => Group)
+  @JoinColumn({ name: 'group_id' })
+  group: Group;
+
+  @OneToMany(() => Division, (division) => division.expense)
+  division?: Division[];
+
+  @ApiProperty()
+  @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
+  createdAt: Date;
+
+  @ApiProperty()
+  @UpdateDateColumn({ type: 'timestamp with time zone', name: 'updated_at' })
+  updatedAt: Date;
 }

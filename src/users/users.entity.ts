@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Loan } from 'src/expenses/loan.entity';
+import { Division } from 'src/expenses/division.entity';
 import { Group } from 'src/groups/group.entity';
 import {
   Column,
@@ -29,21 +29,21 @@ export class User {
   @Column({ type: 'varchar', nullable: true })
   password: string;
 
-  @Column({ nullable: true })
-  google_id: string;
-
-  @OneToMany(() => Loan, (loan) => loan.member)
-  loan: Loan[];
+  @Column({ nullable: true, name: 'google_id' })
+  googleId: string;
 
   @ApiProperty()
   @ManyToMany(() => Group, (group) => group.members)
   groups: Group[];
 
-  @ApiProperty()
-  @CreateDateColumn({ type: 'timestamp with time zone' })
-  created_at: Date;
+  @OneToMany(() => Division, (division) => division.user)
+  expensesDivision?: Division[];
 
   @ApiProperty()
-  @UpdateDateColumn({ type: 'timestamp with time zone' })
-  updated_at: Date;
+  @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
+  createdAt: Date;
+
+  @ApiProperty()
+  @UpdateDateColumn({ type: 'timestamp with time zone', name: 'updated_at' })
+  updatedAt: Date;
 }
